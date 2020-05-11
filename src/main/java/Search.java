@@ -48,7 +48,7 @@ public class Search {
         // Read the developer key from youtube.properties
         Properties properties = new Properties();
 
-        String[][] prueba= new String[6][2];
+        String[][] resultadoBusqueda= new String[6][2];
 
         try {
             InputStream in = Search.class.getResourceAsStream("/" + PROPERTIES_FILENAME);
@@ -99,7 +99,7 @@ public class Search {
             List<SearchResult> searchResultList = searchResponse.getItems();
 
             if (searchResultList != null) {
-                prueba = prettyPrint(searchResultList.iterator(), queryTerm);
+                resultadoBusqueda = prettyPrint(searchResultList.iterator(), queryTerm);
             }
         } catch (GoogleJsonResponseException e) {
             System.err.println("There was a service error: " + e.getDetails().getCode() + " : "
@@ -110,7 +110,7 @@ public class Search {
             t.printStackTrace();
         }
 
-        return prueba;
+        return resultadoBusqueda;
     }
 
     /*
