@@ -36,7 +36,7 @@ public class Search {
     private static final JsonFactory JSON_FACTORY = new JacksonFactory();
 
     /** Global instance of the max number of videos we want returned (50 = upper limit per page). */
-    private static final long NUMBER_OF_VIDEOS_RETURNED = 4;
+    private static final long NUMBER_OF_VIDEOS_RETURNED = 3;
 
     /** Global instance of Youtube object to make all API requests. */
     private static YouTube youtube;
@@ -48,7 +48,7 @@ public class Search {
         // Read the developer key from youtube.properties
         Properties properties = new Properties();
 
-        String[][] resultadoBusqueda= new String[6][2];
+        String[][] resultadoBusqueda= new String[4][2];
 
         try {
             InputStream in = Search.class.getResourceAsStream("/" + PROPERTIES_FILENAME);
@@ -143,7 +143,7 @@ public class Search {
 
 //        String videoId="";
 
-        String[][] infoVideo = new String[6][2];
+        String[][] infoVideo = new String[3][2];
 
         System.out.println("\n=============================================================");
         System.out.println(
@@ -170,11 +170,9 @@ public class Search {
 
             // Double checks the kind is video.
             if (rId.getKind().equals("youtube#video")) {
-                Thumbnail thumbnail = (Thumbnail) singleVideo.getSnippet().getThumbnails().get("default");
 
                 System.out.println(" Video Id " + rId.getVideoId());
                 System.out.println(" Title: " + singleVideo.getSnippet().getTitle());
-                System.out.println(" Thumbnail: " + thumbnail.getUrl());
                 System.out.println("\n-------------------------------------------------------------\n");
             }
         }
