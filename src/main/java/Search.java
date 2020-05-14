@@ -147,7 +147,7 @@ public class Search {
 
         System.out.println("\n=============================================================");
         System.out.println(
-                "   First " + NUMBER_OF_VIDEOS_RETURNED + " videos for search on \"" + query + "\".");
+                 NUMBER_OF_VIDEOS_RETURNED + " resultados para \"" + query + "\".");
         System.out.println("=============================================================\n");
 
         if (!iteratorSearchResults.hasNext()) {

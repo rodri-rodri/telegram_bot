@@ -6,19 +6,21 @@ import org.telegram.telegrambots.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import com.vdurmont.emoji.EmojiParser;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class Bot extends TelegramLongPollingBot {
 
     private boolean busquedaAbierta; //BOOLEANO QUE INDICA SI ESTA ACTIVA LA OPCION DE BUSQUEDA
+    private boolean mostrarResultadosVideo = false;
     private SendMessage message = new SendMessage();
     private String[][] videoInfo;
 
     @Override
     public void onUpdateReceived(Update update) {
-        System.out.println(busquedaAbierta);
+        System.out.println("busqueda aierta = " + busquedaAbierta);
+        System.out.println("mostrar resultados = " + mostrarResultadosVideo);
+
         if (update.hasMessage() && update.getMessage().hasText()){
 
             long chat_id = update.getMessage().getChatId(); //OBTENGO CHATID EN UNA VARIABLE
@@ -54,10 +56,6 @@ public class Bot extends TelegramLongPollingBot {
                 boton.add(videoInfo[2][1]);
                 tablaBotones.add(boton);
 
-//                boton = new KeyboardRow();
-//                boton.add(videoInfo[3][1]);
-//                tablaBotones.add(boton);
-
                 boton = new KeyboardRow();
                 boton.add("VOLVER AL TECLADO");
                 tablaBotones.add(boton);
@@ -75,8 +73,47 @@ public class Bot extends TelegramLongPollingBot {
 
                 busquedaAbierta = false;
 
-
+                mostrarResultadosVideo = true;
+                System.out.println("TECLADO CON VIDEOS ENVIADOS \n" +
+                        "variables busquedaAbierta = "+ busquedaAbierta +
+                        "\n mostrar video seleccionado"+ mostrarResultadosVideo);
             }
+
+            if (mostrarResultadosVideo){
+                int contador =0;
+                for (int i=0;i<3;i++){
+
+                    if (update.getMessage().getText().equals(videoInfo[i][1])) {
+
+                        message = new SendMessage().setChatId(chat_id).setText("https://www.youtube.com/watch?v="+videoInfo[i][0]);
+
+                        try {
+                            sendMessage(message);
+                        } catch (TelegramApiException e) {
+                            System.out.println("ERROR: EL VIDEO NO SE HA ENVIADO");
+                        }
+
+                    } else if (update.getMessage().getText().equals("VOLVER AL TECLADO")) {
+
+                        if (contador==0){
+                            SendMessage msg = new SendMessage()
+                                    .setChatId(chat_id)
+                                    .setText(EmojiParser.parseToUnicode(":alien:"));
+                            ReplyKeyboardRemove keyboardMarkup = new ReplyKeyboardRemove();
+                            msg.setReplyMarkup(keyboardMarkup);
+                            mostrarResultadosVideo = false;
+                            try {
+                                sendMessage(msg); // Call method to send the photo
+                            } catch (TelegramApiException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        contador++;
+                    }
+                }
+            }
+
+
 
 
             if (update.getMessage().getText().equals("/youtube")) {
@@ -92,68 +129,7 @@ public class Bot extends TelegramLongPollingBot {
 
                 busquedaAbierta =new Boolean(true);
 
-            } else if (update.getMessage().getText().equals(videoInfo[0][1])){
-
-                message = new SendMessage().setChatId(chat_id).setText("https://www.youtube.com/watch?v="+videoInfo[0][0]);
-
-                try {
-                    sendMessage(message);
-                } catch (TelegramApiException e) {
-
-                    System.out.println("ERROR: EL VIDEO NO SE HA ENVIADO");
-
-                }
-            } else if (update.getMessage().getText().equals(videoInfo[1][1])){
-
-                message = new SendMessage().setChatId(chat_id).setText("https://www.youtube.com/watch?v="+videoInfo[1][0]);
-
-                try {
-                    sendMessage(message);
-                } catch (TelegramApiException e) {
-
-                    System.out.println("ERROR: EL VIDEO NO SE HA ENVIADO");
-
-                }
-            } else if (update.getMessage().getText().equals(videoInfo[2][1])){
-
-                message = new SendMessage().setChatId(chat_id).setText("https://www.youtube.com/watch?v="+videoInfo[2][0]);
-
-                try {
-                    sendMessage(message);
-                } catch (TelegramApiException e) {
-
-                    System.out.println("ERROR: EL VIDEO NO SE HA ENVIADO");
-
-                }
-
-
-//            } else if (update.getMessage().getText().equals(videoInfo[3][1])){
-//
-//                message = new SendMessage().setChatId(chat_id).setText("https://www.youtube.com/watch?v="+videoInfo[3][0]);
-//
-//                try {
-//                    sendMessage(message);
-//                } catch (TelegramApiException e) {
-//
-//                    System.out.println("ERROR: EL VIDEO NO SE HA ENVIADO");
-//
-//                }
-
-            } else if (update.getMessage().getText().equals("VOLVER AL TECLADO")) {
-                SendMessage msg = new SendMessage()
-                        .setChatId(chat_id)
-                        .setText(":-)");
-                ReplyKeyboardRemove keyboardMarkup = new ReplyKeyboardRemove();
-                msg.setReplyMarkup(keyboardMarkup);
-                try {
-                    sendMessage(msg); // Call method to send the photo
-                } catch (TelegramApiException e) {
-                    e.printStackTrace();
-                }
             }
-
-
-
         }
 
         System.out.println("control fin ejecucion metodo");
