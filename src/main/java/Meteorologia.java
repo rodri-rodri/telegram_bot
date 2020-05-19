@@ -9,7 +9,8 @@ import org.apache.http.util.EntityUtils;
 import java.io.IOException;
 
 public class Meteorologia {
-    public static void doHttpGet(){
+
+    public Tiempo doHttpGet(){
 
         String info="";
         String enlace = "http://dataservice.accuweather.com/forecasts/v1/hourly/1hour/308526?apikey=XQIK9hPy36y7kcJOEHhACXsVfR9Uty9c&language=es&metric=true";
@@ -42,15 +43,12 @@ public class Meteorologia {
             System.out.println("Error desconocido");
             e.printStackTrace();
         }
-//        info = info.substring(1,info.length()-1);
-
 
         info = info.substring(1,info.length()-1);
-        System.out.println(info);
+
         Tiempo tiempo = new Gson().fromJson(info, Tiempo.class);
 
-        System.out.println(tiempo.getTemperature());
-
+        return tiempo;
     }
 
 }
@@ -59,7 +57,10 @@ public class Meteorologia {
 
 class Tiempo {
 
-    String DateTime;
+    /*
+    * EN ESTA CLASE CREO LOS PARAMETROS QUE DEVOLVERA EL JSON*/
+
+    private String DateTime;
     int EpochDateTime;
     int WeatherIcon;
     String IconPhrase;

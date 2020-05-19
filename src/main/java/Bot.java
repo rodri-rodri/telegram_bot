@@ -142,18 +142,54 @@ public class Bot extends TelegramLongPollingBot {
                 busquedaAbierta =new Boolean(true);
 
             }
+
+            if (update.getMessage().getText().equals("/tiempo")){
+
+                Meteorologia meteorologia = new Meteorologia();
+
+                double temperatura = meteorologia.doHttpGet().getTemperature().getValue();
+                String pronostico = meteorologia.doHttpGet().getIconPhrase();
+                boolean esDeDia = meteorologia.doHttpGet().isDaylight();
+                boolean precipitaciones = meteorologia.doHttpGet().isHasPrecipitation();
+                int probabilidadPrecipitaciones = meteorologia.doHttpGet().getPrecipitationProbability();
+                String link = meteorologia.doHttpGet().getLink();
+                String preciciracionesString;
+                if (precipitaciones){
+                    preciciracionesString = "Esta lloviendo, pilla paraguas.";
+                } else {
+                    preciciracionesString = "Cero precipitaciones.";
+                }
+
+                String mensaje = "La temperatura actual en Madrid es : \n" +
+                        pronostico + ".\n" +
+                        temperatura + " Cº.\n"+
+                        preciciracionesString + "\n" +
+                        "Probabilidad de precipitaciones: " + probabilidadPrecipitaciones + "%. \n" +
+                        link;
+
+                message = new SendMessage().setChatId(chat_id).setText(mensaje);
+
+                try {
+                    sendMessage(message);
+                } catch (TelegramApiException e) {
+
+                    System.out.println("NO SE HA ENVIADO EL MENSAJE");
+                }
+
+            }
+
         } else if (update.hasCallbackQuery()) {
-            // Set variables
+
             String call_data = update.getCallbackQuery().getData();
             long message_id = update.getCallbackQuery().getMessage().getMessageId();
             long chat_id = update.getCallbackQuery().getMessage().getChatId();
 
             if (call_data.equals("DESCARGA")) {
-                String answer = "https://www.yout.com/watch?v="+descarga;
+                String link = "https://www.yout.com/watch?v="+descarga;
                 EditMessageText new_message = new EditMessageText()
                         .setChatId(chat_id)
                         .setMessageId(toIntExact(message_id))
-                        .setText(answer);
+                        .setText(link);
                 try {
                     execute(new_message);
                 } catch (TelegramApiException e) {
