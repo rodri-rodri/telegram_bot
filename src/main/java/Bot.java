@@ -1,7 +1,10 @@
 import org.telegram.telegrambots.api.methods.send.SendMessage;
+import org.telegram.telegrambots.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.api.objects.replykeyboard.ReplyKeyboardRemove;
+import org.telegram.telegrambots.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
@@ -9,12 +12,15 @@ import com.vdurmont.emoji.EmojiParser;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.Math.toIntExact;
+
 public class Bot extends TelegramLongPollingBot {
 
     private boolean busquedaAbierta; //BOOLEANO QUE INDICA SI ESTA ACTIVA LA OPCION DE BUSQUEDA
     private boolean mostrarResultadosVideo = false;
     private SendMessage message = new SendMessage();
     private String[][] videoInfo;
+    private String descarga;
 
     @Override
     public void onUpdateReceived(Update update) {
@@ -85,12 +91,21 @@ public class Bot extends TelegramLongPollingBot {
 
                     if (update.getMessage().getText().equals(videoInfo[i][1])) {
 
+                        descarga = videoInfo[i][0];
+
                         message = new SendMessage().setChatId(chat_id).setText("https://www.youtube.com/watch?v="+videoInfo[i][0]);
 
+                        InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
+                        List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
+                        List<InlineKeyboardButton> rowInline = new ArrayList<>();
+                        rowInline.add(new InlineKeyboardButton().setText("DESCARGAR").setCallbackData("DESCARGA"));
+                        rowsInline.add(rowInline);
+                        markupInline.setKeyboard(rowsInline);
+                        message.setReplyMarkup(markupInline);
                         try {
-                            sendMessage(message);
+                            execute(message); // Sending our message object to user
                         } catch (TelegramApiException e) {
-                            System.out.println("ERROR: EL VIDEO NO SE HA ENVIADO");
+                            e.printStackTrace();
                         }
 
                     } else if (update.getMessage().getText().equals("VOLVER AL TECLADO")) {
@@ -113,9 +128,6 @@ public class Bot extends TelegramLongPollingBot {
                 }
             }
 
-
-
-
             if (update.getMessage().getText().equals("/youtube")) {
 
                 message = new SendMessage().setChatId(chat_id).setText(EmojiParser.parseToUnicode("¿Que quieres buscar? :smile:"));
@@ -129,6 +141,24 @@ public class Bot extends TelegramLongPollingBot {
 
                 busquedaAbierta =new Boolean(true);
 
+            }
+        } else if (update.hasCallbackQuery()) {
+            // Set variables
+            String call_data = update.getCallbackQuery().getData();
+            long message_id = update.getCallbackQuery().getMessage().getMessageId();
+            long chat_id = update.getCallbackQuery().getMessage().getChatId();
+
+            if (call_data.equals("DESCARGA")) {
+                String answer = "https://www.yout.com/watch?v="+descarga;
+                EditMessageText new_message = new EditMessageText()
+                        .setChatId(chat_id)
+                        .setMessageId(toIntExact(message_id))
+                        .setText(answer);
+                try {
+                    execute(new_message);
+                } catch (TelegramApiException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
