@@ -128,6 +128,8 @@ public class Bot extends TelegramLongPollingBot {
                 }
             }
 
+
+
             if (update.getMessage().getText().equals("/youtube")) {
 
                 message = new SendMessage().setChatId(chat_id).setText(EmojiParser.parseToUnicode("¿Que quieres buscar? :smile:"));
@@ -154,15 +156,24 @@ public class Bot extends TelegramLongPollingBot {
                 int probabilidadPrecipitaciones = meteorologia.doHttpGet().getPrecipitationProbability();
                 String link = meteorologia.doHttpGet().getLink();
                 String preciciracionesString;
+                String esDeDiaString;
+
                 if (precipitaciones){
                     preciciracionesString = "Esta lloviendo, pilla paraguas.";
                 } else {
                     preciciracionesString = "Cero precipitaciones.";
                 }
 
+                if (esDeDia){
+                    esDeDiaString = "Es de dia.";
+                } else {
+                    esDeDiaString = "Es de noche.";
+                }
+
                 String mensaje = "La temperatura actual en Madrid es : \n" +
                         pronostico + ".\n" +
                         temperatura + " Cº.\n"+
+                        esDeDiaString + "\n" +
                         preciciracionesString + "\n" +
                         "Probabilidad de precipitaciones: " + probabilidadPrecipitaciones + "%. \n" +
                         link;

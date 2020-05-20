@@ -13,13 +13,15 @@ public class Meteorologia {
     public Tiempo doHttpGet(){
 
         String info="";
-        String enlace = "http://dataservice.accuweather.com/forecasts/v1/hourly/1hour/308526?apikey=XQIK9hPy36y7kcJOEHhACXsVfR9Uty9c&language=es&metric=true";
+        String enlace = "http://dataservice.accuweather.com/forecasts/v1/hourly/1hour/308526?apikey=AYA1UWLP42ki8s1pyNdwDEY4wJBvr8IF&language=es&metric=true";
 
         /*ENLACES
          *CON MUCHA INFO:
          *  "http://dataservice.accuweather.com/forecasts/v1/hourly/1hour/308526?apikey=XQIK9hPy36y7kcJOEHhACXsVfR9Uty9c&language=es&details=true&metric=true"
          *CON POCA INFO:
-         *  "http://dataservice.accuweather.com/forecasts/v1/hourly/1hour/308526?apikey=XQIK9hPy36y7kcJOEHhACXsVfR9Uty9c&language=es&metric=true"   */
+         *  "http://dataservice.accuweather.com/forecasts/v1/hourly/1hour/308526?apikey=XQIK9hPy36y7kcJOEHhACXsVfR9Uty9c&language=es&metric=true"
+         * SEGUNDA KEY:
+         * "http://dataservice.accuweather.com/forecasts/v1/hourly/1hour/308526?apikey=AYA1UWLP42ki8s1pyNdwDEY4wJBvr8IF&language=es&metric=true"*/
 
 
         CloseableHttpClient client = HttpClients.createDefault();
@@ -33,6 +35,10 @@ public class Meteorologia {
             System.out.println("JSON response");
             info = EntityUtils.toString((respuesta));
             System.out.println(info);
+            System.out.println("consulta realizada");
+
+
+
 
 
         } catch (IOException ioe){
@@ -52,8 +58,6 @@ public class Meteorologia {
     }
 
 }
-
-
 
 class Tiempo {
 
