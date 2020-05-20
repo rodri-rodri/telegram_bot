@@ -18,17 +18,21 @@ public class Bot extends TelegramLongPollingBot {
 
     private boolean busquedaAbierta; //BOOLEANO QUE INDICA SI ESTA ACTIVA LA OPCION DE BUSQUEDA
     private boolean mostrarResultadosVideo = false;
+    private boolean preguntaTiempo = false;
     private SendMessage message = new SendMessage();
     private String[][] videoInfo;
     private String descarga;
+//    public String localizacions;
+
+
 
     @Override
     public void onUpdateReceived(Update update) {
         System.out.println("busqueda aierta = " + busquedaAbierta);
         System.out.println("mostrar resultados = " + mostrarResultadosVideo);
-
+        System.out.println("hay mensaje??");
         if (update.hasMessage() && update.getMessage().hasText()){
-
+            System.out.println("si");
             long chat_id = update.getMessage().getChatId(); //OBTENGO CHATID EN UNA VARIABLE
 
             System.out.println(update.getMessage().getFrom().getFirstName()+ " - " + update.getMessage().getText()); //MUESTRO EN CONSOLA NOMBRE Y MENSAJE RECIBIDO
@@ -98,7 +102,7 @@ public class Bot extends TelegramLongPollingBot {
                         InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
                         List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
                         List<InlineKeyboardButton> rowInline = new ArrayList<>();
-                        rowInline.add(new InlineKeyboardButton().setText("DESCARGAR").setCallbackData("DESCARGA"));
+                        rowInline.add(new InlineKeyboardButton().setText(EmojiParser.parseToUnicode(":scream_cat:"+"DESCARGAR"+":scream_cat:")).setCallbackData("DESCARGA"));
                         rowsInline.add(rowInline);
                         markupInline.setKeyboard(rowsInline);
                         message.setReplyMarkup(markupInline);
@@ -128,7 +132,19 @@ public class Bot extends TelegramLongPollingBot {
                 }
             }
 
+            if (update.getMessage().getText().equals("/start")) {
 
+                message = new SendMessage().setChatId(chat_id).setText(EmojiParser.parseToUnicode("Holaa!!!"+":stuck_out_tongue_closed_eyes:"+
+                        "\nEscribe / para ver mis opciones\n"+"O dale al botoncito de abajo "+":arrow_down:"));
+
+                try {
+                    sendMessage(message);
+                } catch (TelegramApiException e) {
+
+                    System.out.println("NO SE HA ENVIADO EL MENSAJE");
+                }
+
+            }
 
             if (update.getMessage().getText().equals("/youtube")) {
 
@@ -145,40 +161,44 @@ public class Bot extends TelegramLongPollingBot {
 
             }
 
-            if (update.getMessage().getText().equals("/tiempo")){
+            if (preguntaTiempo){
 
-                Meteorologia meteorologia = new Meteorologia();
+                String localizacions = update.getMessage().getText();
 
-                double temperatura = meteorologia.doHttpGet().getTemperature().getValue();
-                String pronostico = meteorologia.doHttpGet().getIconPhrase();
-                boolean esDeDia = meteorologia.doHttpGet().isDaylight();
-                boolean precipitaciones = meteorologia.doHttpGet().isHasPrecipitation();
-                int probabilidadPrecipitaciones = meteorologia.doHttpGet().getPrecipitationProbability();
-                String link = meteorologia.doHttpGet().getLink();
-                String preciciracionesString;
+                CodigoLocalizacion localizacion = new CodigoLocalizacion();
+
+                String codigoLoc = localizacion.doHttpGetLocation(localizacions);
+                System.out.println(codigoLoc);
+                Meteorologia meteo = new Meteorologia();
+
+                Tiempo tiempo = meteo.doHttpGet(codigoLoc);
+
+                String precipitacionesString;
                 String esDeDiaString;
 
-                if (precipitaciones){
-                    preciciracionesString = "Esta lloviendo, pilla paraguas.";
+                if (tiempo.isHasPrecipitation()){
+                    precipitacionesString = "Esta lloviendo, pilla paraguas.";
                 } else {
-                    preciciracionesString = "Cero precipitaciones.";
+                    precipitacionesString = "Cero precipitaciones.";
                 }
 
-                if (esDeDia){
+                if (tiempo.isDaylight()){
                     esDeDiaString = "Es de dia.";
                 } else {
                     esDeDiaString = "Es de noche.";
                 }
 
-                String mensaje = "La temperatura actual en Madrid es : \n" +
-                        pronostico + ".\n" +
-                        temperatura + " Cº.\n"+
+                String mensaje = "La temperatura actual en " +
+                        update.getMessage().getText()+
+                        " es : \n" +
+                        tiempo.getIconPhrase() + ".\n" +
+                        tiempo.getTemperature().getValue() + " Cº.\n"+
                         esDeDiaString + "\n" +
-                        preciciracionesString + "\n" +
-                        "Probabilidad de precipitaciones: " + probabilidadPrecipitaciones + "%. \n" +
-                        link;
+                        precipitacionesString + "\n" +
+                        "Probabilidad de precipitaciones: " + tiempo.getPrecipitationProbability() + "%. \n" +
+                        tiempo.getLink();
 
-                message = new SendMessage().setChatId(chat_id).setText(mensaje);
+                message = new SendMessage().setChatId(chat_id).setText(EmojiParser.parseToUnicode("\t:sunny:"+":umbrella:"+":cloud:"+":snowflake:\n"+mensaje));
 
                 try {
                     sendMessage(message);
@@ -187,7 +207,61 @@ public class Bot extends TelegramLongPollingBot {
                     System.out.println("NO SE HA ENVIADO EL MENSAJE");
                 }
 
+                preguntaTiempo=false;
+
             }
+
+            if (update.getMessage().getText().equals("/tiempo")){
+
+                message = new SendMessage().setChatId(chat_id).setText("Donde te encuentras? \nPuedes decirme ciudades, capitales o Paises.");
+
+                try {
+                    sendMessage(message);
+                } catch (TelegramApiException e) {
+
+                    System.out.println("NO SE HA ENVIADO EL MENSAJE");
+                }
+
+                preguntaTiempo = true;
+
+            }
+
+//            if (update.getMessage().getText().equals("/tiempo")){
+//
+//                Tiempo tiempo = new Meteorologia().tiempo;
+//                String precipitacionesString;
+//                String esDeDiaString;
+//
+//                if (tiempo.isHasPrecipitation()){
+//                    precipitacionesString = "Esta lloviendo, pilla paraguas.";
+//                } else {
+//                    precipitacionesString = "Cero precipitaciones.";
+//                }
+//
+//                if (tiempo.isDaylight()){
+//                    esDeDiaString = "Es de dia.";
+//                } else {
+//                    esDeDiaString = "Es de noche.";
+//                }
+//
+//                String mensaje = "La temperatura actual en Madrid es : \n" +
+//                        tiempo.getIconPhrase() + ".\n" +
+//                        tiempo.getTemperature().getValue() + " Cº.\n"+
+//                        esDeDiaString + "\n" +
+//                        precipitacionesString + "\n" +
+//                        "Probabilidad de precipitaciones: " + tiempo.getPrecipitationProbability() + "%. \n" +
+//                        tiempo.getLink();
+//
+//                message = new SendMessage().setChatId(chat_id).setText(EmojiParser.parseToUnicode("\t:sunny:"+":umbrella:"+":cloud:"+":snowflake:\n"+mensaje));
+//
+//                try {
+//                    sendMessage(message);
+//                } catch (TelegramApiException e) {
+//
+//                    System.out.println("NO SE HA ENVIADO EL MENSAJE");
+//                }
+//
+//            }
 
         } else if (update.hasCallbackQuery()) {
 
@@ -208,9 +282,6 @@ public class Bot extends TelegramLongPollingBot {
                 }
             }
         }
-
-        System.out.println("control fin ejecucion metodo");
-
     }
 
     @Override
