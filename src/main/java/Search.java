@@ -42,13 +42,16 @@ public class Search {
     private static YouTube youtube;
 
 
-
+    /* Hago esta clase (viene como main) que retorne un Array de dos dimensiones en los que almaceno:
+    * ID del video
+    * Nombre del video
+    * Tambien le digo que reciba como parametro la busqueda del video que recibe el bot*/
     public String[][] Busqueda (String busquedaVideo) {
 
         // Read the developer key from youtube.properties
         Properties properties = new Properties();
-
-        String[][] resultadoBusqueda= new String[4][2];
+        /*Creo array de dos dimensiones y le doy el tamaño en funcion de los videos que quiero que me devuelva*/
+        String[][] resultadoBusqueda= new String[3][2];
 
         try {
             InputStream in = Search.class.getResourceAsStream("/" + PROPERTIES_FILENAME);
@@ -71,6 +74,8 @@ public class Search {
             }).setApplicationName("youtube-cmdline-search-sample").build();
 
             // Get query term from user.
+
+            /*Aqui habia una especie de Scanner asique meto la busqueda del video aqui*/
             String queryTerm = busquedaVideo;
 
             YouTube.Search.List search = youtube.search().list("id,snippet");
@@ -99,6 +104,7 @@ public class Search {
             List<SearchResult> searchResultList = searchResponse.getItems();
 
             if (searchResultList != null) {
+                /*aqui meto la info que me devuelve la busqueda en el array*/
                 resultadoBusqueda = prettyPrint(searchResultList.iterator(), queryTerm);
             }
         } catch (GoogleJsonResponseException e) {
@@ -109,7 +115,7 @@ public class Search {
         } catch (Throwable t) {
             t.printStackTrace();
         }
-
+        /*Retorno la info del video*/
         return resultadoBusqueda;
     }
 
@@ -141,7 +147,9 @@ public class Search {
      */
     private String[][] prettyPrint(Iterator<SearchResult> iteratorSearchResults, String query) {
 
-//        String videoId="";
+        /*Este metodo solo pinta la info que devuelve la busqueda
+        * lo dejo para ver en consola las busquedas que se hagan por el bot
+        * */
 
         String[][] infoVideo = new String[3][2];
 
