@@ -7,25 +7,13 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
-import java.util.Arrays;
 
-public class Meteorologia{
+public class Meteorologia {
 
-    /*Importante, iniciar esta clase con el metodo doHttpGet para que recoja la info que envia la peticion
-    * y la almacene en la clase tiempo, asi solo hara una peticion a la web al contrario que si llamase
-    * al metodo doHttpGet igualando variables en la clase bot que haria una peticion por variable */
-
-    /*Clase con la que obtengo la info de la web y la almaceno en variables de la clase tiempo*/
-
-
-
-    public Tiempo doHttpGet(String codLocation){
+    public Tiempo doHttpGet(){
 
         String info="";
-
-        String enlace = "http://dataservice.accuweather.com/forecasts/v1/hourly/1hour/" +
-                codLocation +
-                "?apikey=XQIK9hPy36y7kcJOEHhACXsVfR9Uty9c&language=es&metric=true";
+        String enlace = "http://dataservice.accuweather.com/forecasts/v1/hourly/1hour/308526?apikey=AYA1UWLP42ki8s1pyNdwDEY4wJBvr8IF&language=es&metric=true";
 
         /*ENLACES
          *CON MUCHA INFO:
@@ -43,11 +31,15 @@ public class Meteorologia{
         try {
 
             resp = client.execute(get);
-            /*Obtengo respuesta de la Web*/
             HttpEntity respuesta = resp.getEntity();
-            /*En la variable info almacen la respuesta de la web*/
+            System.out.println("JSON response");
             info = EntityUtils.toString((respuesta));
             System.out.println(info);
+            System.out.println("consulta realizada");
+
+
+
+
 
         } catch (IOException ioe){
             System.err.println("Algo salio mal...");
@@ -57,11 +49,9 @@ public class Meteorologia{
             System.out.println("Error desconocido");
             e.printStackTrace();
         }
-        /*con el substring quito los corchetes de la info de la web para que el conversor gson lo lea como array y no como objeto
-        * y soluciono el fallo Expected BEGIN_OBJECT but was BEGIN_ARRAY at line 1 column 2 path $*/
+
         info = info.substring(1,info.length()-1);
-        System.out.println(info);
-        /*Almaceno la info que me devuelve la web en una clase Tiempo*/
+
         Tiempo tiempo = new Gson().fromJson(info, Tiempo.class);
 
         return tiempo;
@@ -72,8 +62,7 @@ public class Meteorologia{
 class Tiempo {
 
     /*
-    * EN ESTA CLASE CREO LOS PARAMETROS IGUALES QUE LOS QUE DEVOLVERA LA WEB EN JSON
-    *  creo metodos accesores para poder obtener los resultados*/
+    * EN ESTA CLASE CREO LOS PARAMETROS QUE DEVOLVERA EL JSON*/
 
     private String DateTime;
     int EpochDateTime;
@@ -81,9 +70,6 @@ class Tiempo {
     String IconPhrase;
     boolean HasPrecipitation;
     boolean IsDaylight;
-    /*como la info de la web tiene un array( "cosa":{ ... ... } me da error:
-    * Expected BEGIN_ARRAY but was BEGIN_OBJECT at line 1 column 178 path $.Temperature
-    * Creo una clase temperature y la convierto con Gson como hice con info*/
     private temperatures Temperature;
     private temperatures Temperatures = new Gson().fromJson(String.valueOf(Temperature), temperatures.class);
     int PrecipitationProbability;
@@ -197,8 +183,6 @@ class Tiempo {
     }
 }
 
-/*Clase con la que soluciono el problema:
-* Expected BEGIN_ARRAY but was BEGIN_OBJECT at line 1 column 178 path $.Temperature*/
 class temperatures {
     double Value;
     String Unit;
