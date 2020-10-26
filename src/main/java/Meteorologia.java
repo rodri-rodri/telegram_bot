@@ -15,7 +15,7 @@ public class Meteorologia {
         String info="";
         String enlace = "http://dataservice.accuweather.com/forecasts/v1/hourly/1hour/" +
                 localizacion +
-                "?apikey=AYA1UWLP42ki8s1pyNdwDEY4wJBvr8IF&language=es&metric=true";
+                "?apikey= YOU-API-KEY &language=es&metric=true";
 
         CloseableHttpClient client = HttpClients.createDefault();
         HttpGet get = new HttpGet(enlace);
