@@ -14,7 +14,7 @@ public class CodigoLocalizacion {
 
         String info="";
 
-        String enlace = "http://dataservice.accuweather.com/locations/v1/cities/autocomplete?apikey=%09XQIK9hPy36y7kcJOEHhACXsVfR9Uty9c&q="+location+"&language=es";
+        String enlace = "http://dataservice.accuweather.com/locations/v1/cities/autocomplete?apikey=YOUR-API-KEY"+location+"&language=es";
 
         CloseableHttpClient client = HttpClients.createDefault();
         HttpGet get = new HttpGet(enlace);
